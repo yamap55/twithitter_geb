@@ -12,5 +12,10 @@ driver = {
     return new ChromeDriver()
 }
 
+waiting {
+    timeout = 60
+    retryInterval = 0.5
+}
+
 loginTwitterId = "****"
 loginTwitterPassword = "****"

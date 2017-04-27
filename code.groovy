@@ -33,32 +33,37 @@ Browser.drive {
   $("#password").value(browser.config.rawConfig.loginTwitterPassword)
   $(".submit")[0].click()
   waitFor{ title == "TwitHitter" }
-  num.times {
-    if (!((it + 1) % 10)) {
-      println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${it+1}/${num}, error : ${errorCount}"
-    }
-    go "https://twithitter.com/${createRandomStr()}"
-    def batterStatusArea = $(".batter-status")
-    def pitcherStatusArea = $(".pitcher-status")
-    if (!batterStatusArea && !pitcherStatusArea) {
-      // 存在しないIDの場合
-      errorCount++
-      return
-    }
-    def type = batterStatusArea ? "打者" : "投手"
-    def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
 
-    // def area = pitcherStatusArea[0]
-    // // 球速、制球、スタミナ、残りは変化球
-    // // AとかBとかのランクは.rank-labelで取れるが、球速はなし。
-    // def status = area.find(".status-val")*.text()
-    // println status
-//    println user
-    if (user.status.isTarget()) {
-      def r = "${user.twitterId} : ${user.type} : ${user.status}"
-      println r
-      def result = user.isBatter() ? batterResultFile : pitcherResultFile
-      result << "${r}\n"
+  def playerCount = 0
+  while(num > playerCount) {
+    if (!(playerCount % 100)) {
+      println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${playerCount}/${num}, error : ${errorCount}"
+    }
+
+    // スカウトのランダムページからIDを取得
+    go "https://twithitter.com/scout"
+    $(".search-random").click()
+    waitFor { $(".player") }
+    $(".player .screen-name")*.text().collect{it - "@"}.each {
+      playerCount++
+      // 取得したIDを元に、Playerのデータを取得
+      go "https://twithitter.com/${it}"
+      def batterStatusArea = $(".batter-status")
+      def pitcherStatusArea = $(".pitcher-status")
+      if (!batterStatusArea && !pitcherStatusArea) {
+        // 存在しないIDの場合
+        errorCount++
+        return
+      }
+      def type = batterStatusArea ? "打者" : "投手"
+      def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
+
+      if (user.status.isTarget()) {
+        def r = "${user.twitterId} : ${user.type} : ${user.status}"
+        println r
+        def result = user.isBatter() ? batterResultFile : pitcherResultFile
+        result << "${r}\n"
+      }
     }
   }
 }
@@ -142,6 +147,16 @@ class Status {
   }
 
   def isTarget() {
+    // 限界突破
+    def isLimitBreak = value.every {
+      if (it.key = "変化") {
+        return it.value.any { it > 100 || it < 0 }
+      }
+    }
+    if (isLimitBreak) {
+      return true
+    }
+
     if (type == "打者") {
       return [value["ミート"],value["パワー"],value["走力"],value["肩力"]].every{it >= 80}
     } else {

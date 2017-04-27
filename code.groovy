@@ -149,7 +149,7 @@ class Status {
   def isTarget() {
     // 限界突破
     def isLimitBreak = value.every {
-      if (it.key = "変化") {
+      if (it.key == "変化") {
         return it.value.any { it > 100 || it < 0 }
       }
     }

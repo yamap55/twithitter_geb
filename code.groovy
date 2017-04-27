@@ -148,10 +148,13 @@ class Status {
 
   def isTarget() {
     // 限界突破
-    def isLimitBreak = value.every {
+    def isLimitBreak = value.any {
       if (it.key == "変化") {
         return it.value.any { it > 100 || it < 0 }
+      } else if (it.key == "球速") {
+        return false
       }
+      return it.value > 100
     }
     if (isLimitBreak) {
       return true

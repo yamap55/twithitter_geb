@@ -27,44 +27,60 @@ def createRandomStr = {
 def u = "https://twithitter.com/"
 def errorCount = 0
 
-Browser.drive {
-  go "https://twithitter.com/login"
-  $("#username_or_email").value(browser.config.rawConfig.loginTwitterId)
-  $("#password").value(browser.config.rawConfig.loginTwitterPassword)
-  $(".submit")[0].click()
-  waitFor{ title == "TwitHitter" }
+def playerCount = 0
+def prinlntCount = 0
+def f = {
+  Browser.drive {
+    go "https://twithitter.com/login"
+    $("#username_or_email").value(browser.config.rawConfig.loginTwitterId)
+    $("#password").value(browser.config.rawConfig.loginTwitterPassword)
+    $(".submit")[0].click()
+    waitFor{ title == "TwitHitter" }
 
-  def playerCount = 0
-  while(num > playerCount) {
-    if (!(playerCount % 100)) {
-      println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${playerCount}/${num}, error : ${errorCount}"
-    }
-
-    // スカウトのランダムページからIDを取得
-    go "https://twithitter.com/scout"
-    $(".search-random").click()
-    waitFor { $(".player") }
-    $(".player .screen-name")*.text().collect{it - "@"}.each {
-      playerCount++
-      // 取得したIDを元に、Playerのデータを取得
-      go "https://twithitter.com/${it}"
-      def batterStatusArea = $(".batter-status")
-      def pitcherStatusArea = $(".pitcher-status")
-      if (!batterStatusArea && !pitcherStatusArea) {
-        // 存在しないIDの場合
-        errorCount++
-        return
+    while(num > playerCount) {
+      if (prinlntCount <= playerCount) {
+        prinlntCount += 100
+        println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${playerCount}/${num}, error : ${errorCount}"
       }
-      def type = batterStatusArea ? "打者" : "投手"
-      def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
 
-      if (user.status.isTarget()) {
-        def r = "${user.twitterId} : ${user.type} : ${user.status}"
-        println r
-        def result = user.isBatter() ? batterResultFile : pitcherResultFile
-        result << "${r}\n"
+      // スカウトのランダムページからIDを取得
+      go "https://twithitter.com/scout"
+      waitFor { $(".search-random") && $(".search-result") }
+      sleep(500)// TODO
+      $(".search-random").click()
+      waitFor { $(".player") }
+      $(".player .screen-name")*.text().collect{it - "@"}.each {
+        playerCount++
+        // 取得したIDを元に、Playerのデータを取得
+        go "https://twithitter.com/${it}"
+        def batterStatusArea = $(".batter-status")
+        def pitcherStatusArea = $(".pitcher-status")
+        if (!batterStatusArea && !pitcherStatusArea) {
+          // 存在しないIDの場合
+          errorCount++
+          println "errorid : ${it}"
+          return
+        }
+        def type = batterStatusArea ? "打者" : "投手"
+        def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
+
+        if (user.status.isTarget()) {
+          def r = "${user.twitterId} : ${user.type} : ${user.status}"
+          println r
+          def result = user.isBatter() ? batterResultFile : pitcherResultFile
+          result << "${r}\n"
+        }
       }
     }
+  }
+}
+
+while (num > playerCount){
+  try {
+    f()
+  } catch(e) {
+    println "${new Date().format('yyyy/MM/dd HH:mm:ss')} exception !!"
+    println e
   }
 }
 

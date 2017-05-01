@@ -168,7 +168,7 @@ class Status {
       if (it.key == "変化") {
         return it.value.any { it > 100 || it < 0 }
       } else if (it.key == "球速") {
-        return false
+        return it.value > 160
       }
       return it.value > 100
     }
@@ -179,7 +179,7 @@ class Status {
     if (type == "打者") {
       return [value["ミート"],value["パワー"],value["走力"],value["肩力"]].every{it >= 80}
     } else {
-      if (value["球速"] >= 145 && value["制球"] >= 80) {
+      if (value["球速"] >= 150 && value["制球"] >= 80) {
         if (value["スタミナ"] >= 80) {
           // 先発
           return value["変化"].every{it >= 70 }

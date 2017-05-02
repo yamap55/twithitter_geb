@@ -7,8 +7,10 @@ import geb.Browser
 import groovy.transform.ToString
 
 
-def batterResultPath = "/Users/yamap_55/Desktop/twithitter_batter.txt"
-def pitcherResultPath = "/Users/yamap_55/Desktop/twithitter_pitcher.txt"
+// def batterResultPath = "/Users/yamap_55/Desktop/twithitter_batter.txt"
+// def pitcherResultPath = "/Users/yamap_55/Desktop/twithitter_pitcher.txt"
+def batterResultPath = "./result/batter.csv"
+def pitcherResultPath = "./result/pitcher.csv"
 
 println "start ${new Date().format('yyyy/MM/dd HH:mm:ss')}"
 
@@ -68,7 +70,7 @@ def f = {
           def r = "${user.twitterId} : ${user.type} : ${user.status}"
           println r
           def result = user.isBatter() ? batterResultFile : pitcherResultFile
-          result << "${r}\n"
+          result << "${user}\n"
         }
       }
     }
@@ -86,7 +88,7 @@ while (num > playerCount){
 
 println "end ${new Date().format('yyyy/MM/dd HH:mm:ss')}"
 
-@ToString(excludes = ["profileArea", "rank"])
+//@ToString(excludes = ["profileArea", "rank"])
 class User {
   def profileArea
   def name
@@ -133,15 +135,22 @@ class User {
       status = new Status(type, s)
     }
   }
+  @Override
+  public String toString() {
+    [twitterId,"",type,status.valueList].flatten().join(",")
+  }
 }
 
-@ToString(excludes = ["type"])
+@ToString(excludes = ["type", "valueList"])
 class Status {
   def value = [:]
   def type
+  def valueList
+
   Status(t, status) {
     type = t
     if (type == "打者") {
+      valueList = status.collect{it as int}
       value["ミート"] = status[0] as int
       value["パワー"] = status[1] as int
       value["走力"] = status[2] as int
@@ -159,6 +168,7 @@ class Status {
       value["制球"] = status[1] as int
       value["スタミナ"] = status[2] as int
       value["変化"] = status[3..status.size()-1].collect{it as int}
+      valueList = [value["球速"], value["制球"], value["スタミナ"], value["変化"]].flatten()
     }
   }
 

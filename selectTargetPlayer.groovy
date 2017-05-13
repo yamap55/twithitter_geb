@@ -4,6 +4,8 @@
     @Grab("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"),
 ])
 
+import twithitter.page.*
+
 import groovyx.net.http.HTTPBuilder
 import groovy.json.JsonBuilder
 import geb.Browser
@@ -50,10 +52,9 @@ def prinlntCount = 0
 def f = {
   Browser.drive {
     def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
-    go "https://twithitter.com/login"
-    $("#username_or_email").value(browser.config.rawConfig.loginTwitterId)
-    $("#password").value(browser.config.rawConfig.loginTwitterPassword)
-    $(".submit")[0].click()
+    to Login
+    login(browser.config.rawConfig.loginTwitterId, browser.config.rawConfig.loginTwitterPassword)
+
     waitFor{ title == "TwitHitter" }
 
     while(num > playerCount) {

@@ -64,12 +64,10 @@ def f = {
       }
 
       // スカウトのランダムページからIDを取得
-      go "https://twithitter.com/scout"
-      waitFor { $(".search-random") && $(".search-result") }
-      sleep(500)// TODO
-      $(".search-random").click()
-      waitFor { $(".player") }
-      $(".player .screen-name")*.text().collect{it - "@"}.each {
+      to Scout
+      randomSearch()
+      // sleep(500) // TODO 確認
+      getPlayerIDs().each {
         playerCount++
         // 取得したIDを元に、Playerのデータを取得
         go "https://twithitter.com/${it}"

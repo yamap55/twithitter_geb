@@ -3,7 +3,7 @@ import geb.Page
 
 class PlayerPage extends Page {
   static url = ""
-  static at = { waitFor { $(".player-profile") } }
+  static at = { waitFor { title == "TwitHitter" } }
   static content = {
     statusArea { ($(".batter-status") ?: $(".pitcher-status")).first() }
     playerProfile { $(".player-profile").first() }
@@ -14,7 +14,7 @@ class PlayerPage extends Page {
   }
 
   def existsPlayer() {
-    $(".batter-status") || $(".pitcher-status")
+    $(".player-profile") && ($(".batter-status") || $(".pitcher-status"))
   }
 
   def getPleyerType() {

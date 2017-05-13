@@ -1,7 +1,7 @@
 package twithitter.page
 import geb.Page
 
-class Scout extends Page {
+class ScoutPage extends Page {
   static url = "https://twithitter.com/scout"
   static at = { waitFor { ($("h2").first().text() == "選手スカウト") && $(".search-random") && $(".search-result") } }
   static content = {

@@ -52,7 +52,7 @@ def prinlntCount = 0
 def f = {
   Browser.drive {
     def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
-    to Login
+    to LoginPage
     login(browser.config.rawConfig.loginTwitterId, browser.config.rawConfig.loginTwitterPassword)
 
     waitFor{ title == "TwitHitter" }
@@ -64,14 +64,14 @@ def f = {
       }
 
       // スカウトのランダムページからIDを取得
-      to Scout
+      to ScoutPage
       randomSearch()
       // sleep(500) // TODO 確認
       getPlayerIDs().each {
         playerCount++
 
         // 取得したIDを元に、Playerのデータを取得
-        to Player, it
+        to PlayerPage, it
         if(!existsPlayer()) {
           // 存在しないIDの場合
           errorCount++

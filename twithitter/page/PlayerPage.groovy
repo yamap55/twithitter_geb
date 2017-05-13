@@ -1,7 +1,7 @@
 package twithitter.page
 import geb.Page
 
-class Player extends Page {
+class PlayerPage extends Page {
   static url = "https://twithitter.com"
   static at = { waitFor { $(".player-profile") } }
   static content = {

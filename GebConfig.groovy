@@ -9,7 +9,7 @@ import org.openqa.selenium.chrome.ChromeDriver
 System.setProperty("webdriver.chrome.driver", "./driver/chromedriver")
 
 driver = {
-    return new ChromeDriver()
+   return new ChromeDriver()
 }
 
 waiting {
@@ -19,3 +19,4 @@ waiting {
 
 loginTwitterId = "****"
 loginTwitterPassword = "****"
+googleWebAplicationId = "****"

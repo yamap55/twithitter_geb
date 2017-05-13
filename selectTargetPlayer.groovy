@@ -50,7 +50,7 @@ def errorCount = 0
 def playerCount = 0
 def prinlntCount = 0
 def f = {
-  Browser.drive {
+  Browser.drive() {
     def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
     to LoginPage
     login(browser.config.rawConfig.loginTwitterId, browser.config.rawConfig.loginTwitterPassword)

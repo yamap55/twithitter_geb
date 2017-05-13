@@ -2,7 +2,7 @@ package twithitter.page
 import geb.Page
 
 class LoginPage extends Page {
-  static url = "https://twithitter.com/login"
+  static url = "login"
   static at = { waitFor { title == "Twitter / アプリケーション認証" } }
   static content = {
     userNameField {$("#username_or_email")}

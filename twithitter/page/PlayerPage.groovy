@@ -2,7 +2,7 @@ package twithitter.page
 import geb.Page
 
 class PlayerPage extends Page {
-  static url = "https://twithitter.com"
+  static url = ""
   static at = { waitFor { $(".player-profile") } }
   static content = {
     statusArea { ($(".batter-status") ?: $(".pitcher-status")).first() }
@@ -10,7 +10,7 @@ class PlayerPage extends Page {
   }
 
   String convertToPath(id) {
-    "/${id}"
+    "${id}"
   }
 
   def existsPlayer() {

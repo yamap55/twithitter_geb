@@ -17,6 +17,8 @@ waiting {
   retryInterval = 0.5
 }
 
+baseUrl = "https://twithitter.com/"
+
 loginTwitterId = "****"
 loginTwitterPassword = "****"
 googleWebAplicationId = "****"

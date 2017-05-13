@@ -3,7 +3,7 @@ import geb.Page
 
 class Scout extends Page {
   static url = "https://twithitter.com/scout"
-  static at = { ($("h2").first().text() == "選手スカウト") && $(".search-random") && $(".search-result") }
+  static at = { waitFor { ($("h2").first().text() == "選手スカウト") && $(".search-random") && $(".search-result") } }
   static content = {
     randomSearchButton { $(".search-random") }
     passwordField { $("#password") }

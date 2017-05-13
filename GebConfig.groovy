@@ -9,12 +9,12 @@ import org.openqa.selenium.chrome.ChromeDriver
 System.setProperty("webdriver.chrome.driver", "./driver/chromedriver")
 
 driver = {
-   return new ChromeDriver()
+  return new ChromeDriver()
 }
 
 waiting {
-    timeout = 60
-    retryInterval = 0.5
+  timeout = 60
+  retryInterval = 0.5
 }
 
 loginTwitterId = "****"

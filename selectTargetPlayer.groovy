@@ -69,18 +69,18 @@ def f = {
       // sleep(500) // TODO 確認
       getPlayerIDs().each {
         playerCount++
+
         // 取得したIDを元に、Playerのデータを取得
-        go "https://twithitter.com/${it}"
-        def batterStatusArea = $(".batter-status")
-        def pitcherStatusArea = $(".pitcher-status")
-        if (!batterStatusArea && !pitcherStatusArea) {
+        to Player, it
+        if(!existsPlayer()) {
           // 存在しないIDの場合
           errorCount++
           println "errorid : ${it}"
           return
         }
-        def type = batterStatusArea ? "打者" : "投手"
-        def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
+
+        def pleyerType = getPleyerType()
+        def user = new User(playerProfile, pleyerType, statusArea)
 
         if (user.status.isTarget()) {
           // 出力対象の場合
@@ -127,7 +127,7 @@ class User {
     type == "打者"
   }
 
-  User(profileArea, batterStatusArea, pitcherStatusArea) {
+  User(profileArea, playerType, statusArea) {
     def f = {
       profileArea.$(".${it}")[0].text()
     }
@@ -137,16 +137,14 @@ class User {
     team = f("userteam-none-label")
     popularity = profileArea.find(".userteam-popularity")[0].text().split(" ")[1]
 
-    type = batterStatusArea ? "打者" : "投手"
-    if (batterStatusArea) {
+    type = playerType
+    if (type == "打者") {
       // 打者の場合
-      def area = batterStatusArea[0]
-      def s = area.find(".left-column")[0].find(".status-val")*.text()
+      def s = statusArea.find(".left-column")[0].find(".status-val")*.text()
       status = new Status(type, s)
     } else {
       // 投手の場合
-      def area = pitcherStatusArea[0]
-      def s = area.find(".status-val")*.text()
+      def s = statusArea.find(".status-val")*.text()
       status = new Status(type, s)
     }
   }

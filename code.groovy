@@ -1,14 +1,15 @@
 @Grapes([
     @Grab("org.gebish:geb-core:1.1.1"),
     @Grab("org.seleniumhq.selenium:selenium-support:3.4.0"),
+    @Grab("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1"),
 ])
 
+import groovyx.net.http.HTTPBuilder
+import groovy.json.JsonBuilder
 import geb.Browser
 import groovy.transform.ToString
+import static groovyx.net.http.ContentType.*
 
-
-// def batterResultPath = "/Users/yamap_55/Desktop/twithitter_batter.txt"
-// def pitcherResultPath = "/Users/yamap_55/Desktop/twithitter_pitcher.txt"
 def batterResultPath = "./result/batter.csv"
 def pitcherResultPath = "./result/pitcher.csv"
 
@@ -16,6 +17,21 @@ println "start ${new Date().format('yyyy/MM/dd HH:mm:ss')}"
 
 def batterResultFile = new File(batterResultPath)
 def pitcherResultFile = new File(pitcherResultPath)
+
+// 出力関数（出力対象の場合に呼ばれる）
+def output = {user, googleWebAplicationId ->
+  if (googleWebAplicationId) {
+    def http = new HTTPBuilder( "https://script.google.com/macros/s/${googleWebAplicationId}/" )
+    http.post( path: 'exec', body: user.asJson(),
+               contentType: JSON ) { resp ->
+
+      println "POST Success: ${resp.statusLine}"
+    }
+  } else {
+    def result = user.isBatter() ? batterResultFile : pitcherResultFile
+    result << "${user.asCsvString()}\n"
+  }
+}
 
 def num = 100000
 
@@ -33,6 +49,7 @@ def playerCount = 0
 def prinlntCount = 0
 def f = {
   Browser.drive {
+    def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
     go "https://twithitter.com/login"
     $("#username_or_email").value(browser.config.rawConfig.loginTwitterId)
     $("#password").value(browser.config.rawConfig.loginTwitterPassword)
@@ -67,10 +84,10 @@ def f = {
         def user = new User($(".player-profile")[0], batterStatusArea, pitcherStatusArea)
 
         if (user.status.isTarget()) {
+          // 出力対象の場合
           def r = "${user.twitterId} : ${user.type} : ${user.status}"
           println r
-          def result = user.isBatter() ? batterResultFile : pitcherResultFile
-          result << "${user}\n"
+          output(user, googleWebAplicationId)
         }
       }
     }
@@ -88,7 +105,6 @@ while (num > playerCount){
 
 println "end ${new Date().format('yyyy/MM/dd HH:mm:ss')}"
 
-//@ToString(excludes = ["profileArea", "rank"])
 class User {
   def profileArea
   def name
@@ -135,9 +151,30 @@ class User {
       status = new Status(type, s)
     }
   }
-  @Override
-  public String toString() {
+
+  def asCsvString() {
     [twitterId,"",type,status.valueList].flatten().join(",")
+  }
+
+  def asJson() {
+    def body = [
+      id: twitterId,
+      type: isPitcher() ? 0 : 1,
+      status : [:]
+    ]
+    if (isPitcher()) {
+      body.status["speed"] = status.value["球速"]
+      body.status["control"] = status.value["制球"]
+      body.status["stamina"] = status.value["スタミナ"]
+      body.status["breaking_ball"] = status.value["変化"]
+    } else {
+      body.status["meet"] = status.value["ミート"]
+      body.status["power"] = status.value["パワー"]
+      body.status["run"] = status.value["走力"]
+      body.status["arm"] = status.value["肩力"]
+      body.status["def"] = status.valueList[4..status.valueList.size()-1]
+    }
+    new JsonBuilder(body).toString()
   }
 }
 

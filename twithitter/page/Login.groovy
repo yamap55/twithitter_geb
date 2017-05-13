@@ -3,7 +3,7 @@ import geb.Page
 
 class Login extends Page {
   static url = "https://twithitter.com/login"
-  static at = { title == "Twitter / アプリケーション認証" }
+  static at = { waitFor { title == "Twitter / アプリケーション認証" } }
   static content = {
     userNameField {$("#username_or_email")}
     passwordField { $("#password") }

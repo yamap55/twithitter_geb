@@ -41,8 +41,7 @@ def f = {
 
         // スカウトのランダムページからIDを取得
         to ScoutPage
-        randomSearch()
-        getPlayerIDs().each {
+        getPlayerIDs(100).each {
           playerCount++
 
           // 取得したIDを元に、Playerのデータを取得

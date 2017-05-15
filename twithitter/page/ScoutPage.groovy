@@ -18,4 +18,13 @@ class ScoutPage extends Page {
   def getPlayerIDs() {
     $(".player .screen-name")*.text().collect{it - "@"}
   }
+
+  def getPlayerIDs(playerCout) {
+    def resultSet = [] as Set
+    while (resultSet.size() < playerCout) {
+      randomSearch()
+      resultSet.addAll(getPlayerIDs())
+    }
+    resultSet
+  }
 }

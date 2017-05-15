@@ -23,6 +23,8 @@ def errorCount = 0
 
 def playerCount = 0
 def prinlntCount = 0
+def outputPlayerIds = []
+
 def f = {
   Browser.drive() {
     def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
@@ -55,8 +57,9 @@ def f = {
 
           def pleyerType = getPleyerType()
           def user = new Player(playerProfile, pleyerType, statusArea)
-          if (user.status.isTarget()) {
+          if (user.status.isTarget() && !outputPlayerIds.contains(user.twitterId)) {
             // 出力対象の場合
+            outputPlayerIds << user.twitterId
             def r = "${user.twitterId} : ${user.type} : ${user.status}"
             println r
             outputer.output(user)

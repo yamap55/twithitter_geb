@@ -57,36 +57,41 @@ def f = {
     waitFor{ title == "TwitHitter" }
 
     while(num > playerCount) {
-      if (prinlntCount <= playerCount) {
-        prinlntCount += 100
-        println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${playerCount}/${num}, error : ${errorCount}"
-      }
-
-      // スカウトのランダムページからIDを取得
-      to ScoutPage
-      randomSearch()
-      // sleep(500) // TODO 確認
-      getPlayerIDs().each {
-        playerCount++
-
-        // 取得したIDを元に、Playerのデータを取得
-        to PlayerPage, it
-        if(!existsPlayer()) {
-          // 存在しないIDの場合
-          errorCount++
-          println "errorid : ${it}"
-          return
+      try {
+        if (prinlntCount <= playerCount) {
+          prinlntCount += 100
+          println "${new Date().format('yyyy/MM/dd HH:mm:ss')}, ${playerCount}/${num}, error : ${errorCount}"
         }
 
-        def pleyerType = getPleyerType()
-        def user = new Player(playerProfile, pleyerType, statusArea)
+        // スカウトのランダムページからIDを取得
+        to ScoutPage
+        randomSearch()
+        // sleep(500) // TODO 確認
+        getPlayerIDs().each {
+          playerCount++
 
-        if (user.status.isTarget()) {
-          // 出力対象の場合
-          def r = "${user.twitterId} : ${user.type} : ${user.status}"
-          println r
-          output(user, googleWebAplicationId)
+          // 取得したIDを元に、Playerのデータを取得
+          to PlayerPage, it
+          if(!existsPlayer()) {
+            // 存在しないIDの場合
+            errorCount++
+            println "errorid : ${it}"
+            return
+          }
+
+          def pleyerType = getPleyerType()
+          def user = new Player(playerProfile, pleyerType, statusArea)
+          if (user.status.isTarget()) {
+            // 出力対象の場合
+            def r = "${user.twitterId} : ${user.type} : ${user.status}"
+            println r
+            output(user, googleWebAplicationId)
+          }
         }
+      } catch(e) {
+        println "${new Date().format('yyyy/MM/dd HH:mm:ss')} exception !!!"
+        println e.printStackTrace()
+        report "exception_${new Date().format('yyyyMMddHHmmss')}"
       }
     }
   }
@@ -97,7 +102,7 @@ while (num > playerCount){
     f()
   } catch(e) {
     println "${new Date().format('yyyy/MM/dd HH:mm:ss')} exception !!"
-    println e
+    println e.printStackTrace()
   }
 }
 

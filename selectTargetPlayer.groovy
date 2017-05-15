@@ -19,31 +19,8 @@ println "start ${new Date().format('yyyy/MM/dd HH:mm:ss')}"
 def batterResultFile = new File(batterResultPath)
 def pitcherResultFile = new File(pitcherResultPath)
 
-// 出力関数（出力対象の場合に呼ばれる）
-def output = {user, googleWebAplicationId ->
-  if (googleWebAplicationId) {
-    def http = new HTTPBuilder( "https://script.google.com/macros/s/${googleWebAplicationId}/" )
-    http.post( path: 'exec', body: user.asJson(),
-               contentType: JSON ) { resp ->
-
-      println "POST Success: ${resp.statusLine}"
-    }
-  } else {
-    def result = user.isBatter() ? batterResultFile : pitcherResultFile
-    result << "${user.asCsvString()}\n"
-  }
-}
-
 def num = 100000
 
-def createRandomStr = {
-  def array = (0..9)+('a'..'z')+'_'
-  def f = {
-    new Random().with { (1..4).collect { array[nextInt(array.size())] }.join() }
-  }
-}()
-
-def u = "https://twithitter.com/"
 def errorCount = 0
 
 def playerCount = 0
@@ -66,7 +43,6 @@ def f = {
         // スカウトのランダムページからIDを取得
         to ScoutPage
         randomSearch()
-        // sleep(500) // TODO 確認
         getPlayerIDs().each {
           playerCount++
 

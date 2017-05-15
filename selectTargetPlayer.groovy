@@ -7,9 +7,7 @@
 import twithitter.page.*
 import twithitter.*
 
-import groovyx.net.http.HTTPBuilder
 import geb.Browser
-import static groovyx.net.http.ContentType.*
 
 def batterResultPath = "./result/batter.csv"
 def pitcherResultPath = "./result/pitcher.csv"
@@ -28,6 +26,7 @@ def prinlntCount = 0
 def f = {
   Browser.drive() {
     def googleWebAplicationId = browser.config.rawConfig.googleWebAplicationId
+    def outputer = new Outputer(googleWebAplicationId, batterResultFile, pitcherResultFile)
     to LoginPage
     login(browser.config.rawConfig.loginTwitterId, browser.config.rawConfig.loginTwitterPassword)
 
@@ -61,7 +60,7 @@ def f = {
             // 出力対象の場合
             def r = "${user.twitterId} : ${user.type} : ${user.status}"
             println r
-            output(user, googleWebAplicationId)
+            outputer.output(user)
           }
         }
       } catch(e) {

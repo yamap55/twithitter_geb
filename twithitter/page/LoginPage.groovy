@@ -1,6 +1,7 @@
 package twithitter.page
 import geb.Page
 
+// Twitter認証ログインページ
 class LoginPage extends Page {
   static url = "login"
   static at = { waitFor { title == "Twitter / アプリケーション認証" } }

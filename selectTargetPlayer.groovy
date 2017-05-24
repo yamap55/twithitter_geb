@@ -44,7 +44,8 @@ def f = {
         // スカウトのランダムページからIDを取得
         to ScoutPage
         def playerIds = getPlayerIDs(100)
-        
+
+        // 能力値が空のプレイヤーはここで除く（IDを保持しておきたいためここに羅列）
         playerIds = playerIds - ["zoukin10", "Nefachel", "88957"]
         playerIds.each {
           playerCount++
@@ -69,6 +70,7 @@ def f = {
           }
         }
       } catch(e) {
+        // 例外処理（プレイヤーとしては存在するのに能力値が空のパターン以外にあるか？）
         println "${new Date().format('yyyy/MM/dd HH:mm:ss')} exception !!!"
         println e.printStackTrace()
         report "exception_${new Date().format('yyyyMMddHHmmss')}"
